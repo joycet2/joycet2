@@ -1,0 +1,42 @@
+{{ config(materialized='table') }}
+
+SELECT
+    PART_NUMBER,
+    PART_DESCRIPTION,
+    NEW_PART_NUMBER,
+    NEW_PART_DESCRIPTION,
+    EXTENDED_DESCRIPTION,
+
+    matched_in_equivalent,
+    golden_code,
+    matched_in_ln,
+
+    item_description,
+    inv_allocated,
+    inv_in_transit,
+    inv_on_order,
+    inv_on_hand,
+    total_inventory,
+    is_active,
+    ready_to_obsolete,
+    entity,
+    item_group,
+    old_unit,
+    new_unit,
+
+    found_in_equivalent_flag,
+    found_in_dku_flag,
+    unit_mismatch_flag,
+
+    CASE
+        WHEN total_inventory > 0 THEN 'Has Inventory'
+        WHEN total_inventory = 0 THEN 'No Inventory'
+        ELSE 'Unknown'
+    END AS inventory_status,
+
+    CASE
+        WHEN ready_to_obsolete = TRUE THEN 'Ready to Obsolete'
+        ELSE 'Keep'
+    END AS obsolete_status
+
+FROM {{ ref('int_cross_reference_equivalent_match') }}
